@@ -1,0 +1,24 @@
+:root {
+  --page-background: #f4f6fa;
+  --page-text-color: #1f2d3d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--page-background);
+  color: var(--page-text-color);
+  font-family:
+    'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
