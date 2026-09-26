@@ -27,7 +27,7 @@
                     <input
                         id="password"
                         v-model="data.password"
-                        type=password
+                        type="password"
                         placeholder="请输入密码:"
                         autocomplete="current-password"
                         @input="errorMsg = ''"
@@ -37,7 +37,7 @@
 
             <div class="row">
                 <label class="remember">
-                    <input v-model="data.remember" type="checkbox" @click="psw_remember = 'on'"/>
+                    <input v-model="data.remember" type="checkbox" />
                     <span>记住我</span>
                 </label>
                 <a class="link" href="https://www.baidu.com/?tn=68018901_16_pg" target="_blank">忘记密码？</a>
@@ -45,7 +45,7 @@
 
             <p v-if="errorMsg" class="error">{{ errorMsg }}</p>
 
-            <button class="submit" type="submit":disabled="loading">
+            <button class="submit" type="submit" :disabled="loading">
                 {{ loading ? '登录中…' : '登 录' }}
             </button>
             <p class="tip">© Powered by 大作业第6组</p>
@@ -54,12 +54,8 @@
 </template>
 
 <script setup lang="ts">
-// @ts-ignore
 import { reactive, ref } from 'vue';
-import { req } from './api/user.js';  
-import { requestInterceptor } from './api/user.js';
-import { handleError } from './api/user.js';
-import axios from "axios";
+import { login } from './api/user.js';
 
 const emit = defineEmits<{
     (e: 'login-success', username: string): void;
@@ -88,56 +84,40 @@ function validate(): string {
     return '';
 }
 
-/* 对比帐密是否一样并输出布尔值 */
-async function loginRequest(username: string, password: string){
-    req.post("/api/auth/login", { username, password })
-        .then((response) => {
-            console.log(response.code);
-            return response;
-        }).catch((error) => {
-            return error;
-        });
-}
-
- // return new Promise((resolve) => {
-    //     setTimeout(() => {
-    //         resolve(username === MOCK_USER.username && password === MOCK_USER.password);
-    //     }, 600);
-    // });
- 
 async function handleLogin() {
     errorMsg.value = validate();
     if (errorMsg.value) return;
 
     loading.value = true;
     try {
-        //接入后端
-        await axios.post("api/auth/login", {username:data.username, password:data.password})
-        
-        const ok = await loginRequest(data.username, data.password);
+        const res = await login({
+            username: data.username,
+            password: data.password,
+        });
 
-        if (ok.code !== 0 && ok.msg !== "success") {
-            errorMsg.value = '账号或密码错误，请重新输入';
+        // 后端约定：code === 0 或 msg === 'success' 表示登录成功
+        if (res?.code !== 0 && res?.msg !== 'success') {
+            errorMsg.value = res?.msg || '账号或密码错误，请重新输入';
             data.password = '';
             return;
         }
 
+        // 保存 token，供请求拦截器自动携带
+        if (res?.data?.token) localStorage.setItem('token', res.data.token);
+
         if (data.remember) {
             localStorage.setItem('login_user', data.username);
-            router.push({ path: '/index' });
         } else {
             localStorage.removeItem('login_user');
-            router.push({ path: '/index' });
         }
 
+        // 登录成功后的跳转由父组件通过 @login-success 决定
         emit('login-success', data.username);
-    }
-    catch{
-        errorMsg.value = '账号或密码错误，请重新输入';
+    } catch (err) {
+        errorMsg.value =
+            err instanceof Error && err.message ? err.message : '账号或密码错误，请重新输入';
         data.password = '';
-        return;
-    } 
-    finally {
+    } finally {
         loading.value = false;
     }
 }

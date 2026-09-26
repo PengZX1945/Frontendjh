@@ -1,36 +1,39 @@
 import axios from "axios";
-//全局性的配置：axios实例
 
 export const req = axios.create({
     baseURL: "/api",
-    timeout: 2000
+    timeout: 5000,
 });
 
-function pt(){
-    req.get("/api/auth/login");
-}
-//拦截器：判断是否有token，没token去登陆界面
-//请求拦截(token);拦截器作用：再发送请求之前增加拦截，做自定义的处理之类的
-export function requestInterceptor(){
-    const requestinterceptor = req.interceptors.request.use(config => {
+// 请求拦截器：自动携带 token
+// 在模块加载时注册一次即可，暴露成函数反复调用会重复注册拦截器。
+req.interceptors.request.use(
+    (config) => {
         const token = localStorage.getItem("token");
-        console.log("请求拦截器执行");
-        if(token) config.headers.Authorization = `Bearer ${token}`;
+        if (token) config.headers.Authorization = `Bearer ${token}`;
         return config;
-    },(error) => {
-        console.error(error);
-        return Promise.reject(error);
-    }); 
-}
-//移除拦截器：axios.interceptors.request.eject(requestinterceptor);
-//处理错误
-export function handleError(error){
-    req.interceptors.response.use(
-        res => res.data,
-        err => Promise.reject(new Error(err.response?.data?.message || "网络错误"))
-    );
-}
+    },
+    (error) => Promise.reject(error)
+);
 
-export function login(data){
-    return req.post('/login', data);
+// 响应拦截器：成功时直接返回 data，失败时统一抛出可读的错误信息
+req.interceptors.response.use(
+    (res) => res.data,
+    (error) => {
+        const message =
+            error.response?.data?.message ||
+            error.response?.data?.msg ||
+            error.message ||
+            "网络错误";
+        return Promise.reject(new Error(message));
+    }
+);
+
+/**
+ * 登录接口
+ * @param {{ username: string, password: string }} data
+ * @returns {Promise<{ code?: number, msg?: string, data?: { token?: string } }>?}
+ */
+export function login(data) {
+    return req.post("/auth/login", data);
 }
