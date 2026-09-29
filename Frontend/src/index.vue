@@ -64,9 +64,6 @@ const psw_remember = ref('on'); // 记住我选项，默认选中
 /** 模拟后端的账号数据，接入真实接口时删除 */
 const MOCK_USER = { username: 'admin', password: '123456' };
 
-// 暂时放后端接口地址
-const url="http://127.0.0.1:4523/m1/8866241-8663052-default"
-
 const data = reactive({
     username: '',
     password: '',
