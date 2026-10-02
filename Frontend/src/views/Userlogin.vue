@@ -11,7 +11,6 @@
         name="username"
         placeholder="请输入账号"
         autocomplete="username"
-        :error="errors.username"
       />
 
       <AuthInput
@@ -23,7 +22,6 @@
         name="password"
         placeholder="请输入密码"
         autocomplete="current-password"
-        :error="errors.password"
       />
 
       <div class="row">
@@ -55,9 +53,9 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { AuthAlert, AuthButton, AuthInput, AuthShell } from '@/components/auth';
+import { AuthAlert, AuthButton, AuthInput, AuthShell } from '@/components/auth/export';
 import { login } from '../api/request';
-import { validateLoginUsername, validatePassword } from '@/utils/validators';
+import { ErrorCode, resolveErrorMessage } from '@/api/errorCode';
 
 const route = useRoute();
 const router = useRouter();
@@ -72,7 +70,6 @@ const form = reactive({
     remember: true
 });
 
-const errors = reactive({ username: '', password: '' });
 const loading = ref(false);
 const message = ref('');
 
@@ -88,34 +85,21 @@ onMounted(() => {
     }
 });
 
-function clearError(field: 'username' | 'password') {
-    errors[field] = '';
-    message.value = '';
-}
-
-// 校验表单，返回是否通过
-function validate(): boolean {
-    form.username = form.username.trim();
-    errors.username = validateLoginUsername(form.username);
-    errors.password = validatePassword(form.password);
-    return !errors.username && !errors.password;
-}
-
+// 登录不做前端校验，账号 / 密码是否正确交给后端判断
 async function handleLogin() {
     if (loading.value) return;
     message.value = '';
-    if (!validate()) return;
 
     loading.value = true;
     try {
         const res = await login({
-            username: form.username,
+            username: form.username.trim(),
             password: form.password,
         });
 
-        // 后端约定：code === 0表示登录成功
-        if (res?.code !== 0) {
-            message.value = res?.msg || '账号或密码错误，请重新输入';
+        // 后端约定：code === 0 表示登录成功，其余错误码统一走错误码表（api/errorCode.ts）
+        if (res?.code !== ErrorCode.SUCCESS) {
+            message.value = resolveErrorMessage(res?.code, res?.msg, '登录失败，请稍后重试');
             form.password = '';
             return;
         }

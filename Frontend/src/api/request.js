@@ -1,10 +1,17 @@
 import axios from "axios";
 import { router } from "../router";
+import { ErrorCode } from "./errorCode";
 
 export const req = axios.create({
     baseURL: "/api",
     timeout: 5000,
 });
+
+// 本地凭证统一在这里清理，和 router/index.js 的守卫保持一致
+function clearAuth() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("login_user");
+}
 
 // 请求拦截器：自动携带 token
 // 在模块加载时注册一次即可，暴露成函数反复调用会重复注册拦截器。
@@ -19,7 +26,22 @@ req.interceptors.request.use(
 
 // 响应拦截器：成功时直接返回 data，失败时统一抛出可读的错误信息
 req.interceptors.response.use(
-    (res) => res.data,
+    (res) => {
+        const body = res.data;
+
+        // 10002：未登录 / 登录已过期（错误码表要求前端跳登录页），清凭证后带上回跳地址
+        if (body?.code === ErrorCode.UNAUTHORIZED) {
+            clearAuth();
+            if (router.currentRoute.value.name !== "login") {
+                router.push({
+                    name: "login",
+                    query: { redirect: router.currentRoute.value.fullPath },
+                });
+            }
+        }
+
+        return body;
+    },
     (error) => {
         const message =
             error.response?.data?.message ||
@@ -31,8 +53,7 @@ req.interceptors.response.use(
             error.response?.data?.status === 401;
 
         if (is401) {
-            localStorage.removeItem("token");
-            localStorage.removeItem("login_user");
+            clearAuth();
             router.push({ name: "login" });
         }
 
@@ -44,6 +65,7 @@ req.interceptors.response.use(
  * 登录接口
  * @param {{ username: string, password: string }} data
  * @returns {Promise<{ code?: number, msg?: string, data?: { token?: string } }>?}
+ * @see 错误码 10006 用户名或密码错误、10010 账号已被禁用，完整表见 api/errorCode.ts
  */
 export function login(data) {
     return req.post("/auth/login", data);
@@ -53,6 +75,7 @@ export function login(data) {
  * 注册接口
  * @param {{ username: string, password: string }} data
  * @returns {Promise<{ code?: number, msg?: string, data?: unknown }>?}
+ * @see 错误码 10005 用户名已存在，完整表见 api/errorCode.ts
  */
 export function register(data) {
     return req.post("/auth/register", data);

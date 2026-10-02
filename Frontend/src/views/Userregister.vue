@@ -76,7 +76,8 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { AuthAlert, AuthButton, AuthInput, AuthShell } from '@/components/auth'
+import { AuthAlert, AuthButton, AuthInput, AuthShell } from '@/components/auth/export'
+import { ErrorCode, resolveErrorMessage } from '@/api/errorCode'
 import { register } from '../api/request'
 import {
   STRENGTH_TEXT,
@@ -112,7 +113,7 @@ function validate(): boolean {
   errors.password = validatePassword(form.password)
   errors.confirm = validateConfirm(form.password, form.confirm)
   errors.agree = agreed.value ? '' : '请先阅读并同意《用户服务协议》'
-
+  // 空就是通过，非空就是不通过
   return !errors.username && !errors.password && !errors.confirm && !errors.agree
 }
 
@@ -130,10 +131,10 @@ async function onSubmit() {
     } else {
       const res = await register({ username: form.username, password: form.password })
 
-      // 后端约定：code === 0 表示注册成功
-      if (res?.code !== 0) {
+      // 后端约定：code === 0 表示注册成功，其它错误码统一走错误码表（api/errorCode.ts）
+      if (res?.code !== ErrorCode.SUCCESS) {
         messageType.value = 'error'
-        message.value = res?.msg || '注册失败，该账号可能已被使用'
+        message.value = resolveErrorMessage(res?.code, res?.msg, '注册失败，该账号可能已被使用')
         return
       }
     }
@@ -155,7 +156,6 @@ async function onSubmit() {
 </script>
 
 <style scoped>
-/* 只保留注册页独有的样式，外壳 / 输入框 / 按钮样式见 components/auth */
 
 .switch {
   margin: 0 0 20px;

@@ -22,17 +22,14 @@
  */
 withDefaults(
   defineProps<{
-    /** 卡片主标题 */
     title: string
-    /** 标题下方的说明文字 */
     subtitle?: string
-    /** 卡片底部的版权等小字 */
     tip?: string
   }>(),
   {
     subtitle: '',
     tip: '',
-  },
+  }
 )
 </script>
 

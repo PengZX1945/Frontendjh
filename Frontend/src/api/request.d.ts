@@ -9,7 +9,7 @@ export interface AuthPayload {
   password: string
 }
 
-/** 后端统一返回结构：code === 0 表示成功 */
+/** 后端统一返回结构：code === 0 表示成功，其余错误码见 api/errorCode.ts */
 export interface AuthResult {
   code?: number
   msg?: string
@@ -21,6 +21,8 @@ export interface AuthResult {
 
 export declare const req: import('axios').AxiosInstance
 
+/** 登录接口；错误码 10006 用户名或密码错误、10010 账号已被禁用 */
 export declare function login(data: AuthPayload): Promise<AuthResult>
 
+/** 注册接口；错误码 10005 用户名已存在 */
 export declare function register(data: AuthPayload): Promise<AuthResult>
