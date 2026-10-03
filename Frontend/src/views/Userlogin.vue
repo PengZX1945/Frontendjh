@@ -25,10 +25,7 @@
       />
 
       <div class="row">
-        <label class="remember">
-          <input v-model="form.remember" type="checkbox" />
-          <span>记住我</span>
-        </label>
+        <el-checkbox v-model="form.remember">记住我</el-checkbox>
         <a
           class="link"
           href="https://www.baidu.com/?tn=68018901_16_pg"
@@ -148,23 +145,6 @@ async function handleLogin() {
     justify-content: space-between;
     margin-bottom: 16px;
     font-size: 13px;
-}
-
-.remember {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: #475569;
-    cursor: pointer;
-    user-select: none;
-}
-
-.remember input[type='checkbox'] {
-    width: 15px;
-    height: 15px;
-    margin: 0;
-    accent-color: #2563eb;
-    cursor: pointer;
 }
 
 .link {

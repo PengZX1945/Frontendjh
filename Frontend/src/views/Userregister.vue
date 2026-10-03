@@ -59,10 +59,9 @@
       />
 
       <div class="agree-wrap">
-        <label class="agree">
-          <input v-model="agreed" type="checkbox" class="agree__box" @change="errors.agree = ''" />
-          <span>我已阅读并同意 <a class="link" href="#">《用户服务协议》</a></span>
-        </label>
+        <el-checkbox v-model="agreed" class="agree" @change="errors.agree = ''">
+          我已阅读并同意 <a class="link" href="#">《用户服务协议》</a>
+        </el-checkbox>
         <p v-if="errors.agree" class="agree__error">{{ errors.agree }}</p>
       </div>
 
@@ -216,22 +215,12 @@ async function onSubmit() {
 
 .agree {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-start;
+  height: auto;
   font-size: 13px;
   line-height: 1.6;
   color: #7a7a7a;
-  cursor: pointer;
-  user-select: none;
-}
-
-.agree__box {
-  width: 15px;
-  height: 15px;
-  margin: 0;
-  accent-color: #2563eb;
-  cursor: pointer;
-  flex: none;
+  white-space: normal;
 }
 
 .agree__error {

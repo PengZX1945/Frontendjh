@@ -2,27 +2,26 @@
     <div class="container">
         <div class="display_block">
             <div class="navigate_bar">
-                <div class="navigate_selection_bar">
-                    <div class="navigate_selection" @click="tab = '动态'" :style="tab === '动态' ? { backgroundColor: 'lightgray', color: 'green' } : undefined"><b>动态</b></div>
-                    <div class="navigate_selection" @click="tab = '投稿'" :style="tab === '投稿' ? { backgroundColor: 'lightgray', color: 'green' } : undefined"><b>投稿</b></div>
-                </div>
+                <el-segmented v-model="tab" :options="tabs" class="navigate_selection_bar" />
                 <div class="user_bar">
-                    <span>当前用户：{{ currentUser }}</span>
-                    <button class="logout" @click="handleLogout">退出登录</button>
+                    <span>当前用户：<el-tag v-if="currentUser" type="success" size="small">{{ currentUser }}</el-tag><el-tag v-else type="info" size="small">未登录</el-tag></span>
+                    <el-button type="danger" plain size="small" @click="handleLogout">退出登录</el-button>
                 </div>
                 <div class="news" v-if="tab === '动态'">
-                    <div class="news_content" v-for="i in newslist" :key="i.id">
+                    <el-empty v-if="!newslist.length" description="暂无动态" :image-size="80" />
+                    <el-card v-for="i in newslist" :key="i.id" class="news_card" shadow="hover">
 
                         <h4><b>{{ i.title }}</b></h4>
                         <p><i>{{ i.content }}</i></p>
 
-                    </div>
+                    </el-card>
                 </div>
                 <div class="news" v-if="tab === '投稿'">
-                    <div class="videos_content" v-for="i in videoslist" :key="i.id">
+                    <el-empty v-if="!videoslist.length" description="暂无投稿" :image-size="80" />
+                    <el-card v-for="i in videoslist" :key="i.id" class="news_card" shadow="hover">
                         <h4><b>{{ i.title }}</b></h4>
                         <p><i>{{ i.content }}</i></p>
-                    </div>
+                    </el-card>
                 </div>
             </div>
         </div>
@@ -47,6 +46,7 @@ function handleLogout() {
 }
 
 const tab = ref("动态");
+const tabs = ["动态", "投稿"];
 
 const newslist = ref([
     { id: 1, title: "动态1", content: "动态1的内容" },
@@ -73,36 +73,30 @@ const videoslist = ref([
     width: 300px;
     height: 500px;
     border: 2px solid black;
+    /* 让内部区域可以按剩余高度分配，卡片列表才能滚动 */
+    display: flex;
+    flex-direction: column;
 }
 
 .navigate_bar {
     display: flex;
     flex-direction: column;
+    flex: 1;
+    min-height: 0;
     margin-bottom: 10px;
 }
 
 .navigate_selection_bar {
-    display: flex;
-}
-
-.navigate_selection {
-    width: 100px;
-    height: 50px;
-    border: 2px solid gray;
-    text-align: center;
-    font-size: 20px;
-    line-height: 50px;
-    cursor: pointer;
-    box-sizing: border-box;
-}
-
-.navigate_selection + .navigate_selection {
-    margin-left: -2px;
+    width: 100%;
 }
 
 .news {
     width: 100%;
     text-align: left;
+    /* 卡片内容超出 500px 的容器时自己滚动，别把外框撑破 */
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
 }
 
 .user_bar {
@@ -114,23 +108,15 @@ const videoslist = ref([
     color: gray;
 }
 
-.logout {
-    padding: 4px 10px;
-    font-size: 12px;
-    color: #b91c1c;
-    background: #fff;
-    border: 1px solid #fecaca;
-    border-radius: 6px;
-    cursor: pointer;
+.news_card {
+    margin-bottom: 8px;
 }
 
-.logout:hover {
-    background: #fef2f2;
+.news_card h4 {
+    margin: 0 0 6px;
 }
 
-.news_content,
-.videos_content {
-    border-bottom: 1px solid #fff;
-    padding: 8px 0px;
+.news_card p {
+    margin: 0;
 }
 </style>
