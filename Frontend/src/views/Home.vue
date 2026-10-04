@@ -4,7 +4,7 @@
             <div class="navigate_bar">
                 <el-segmented v-model="tab" :options="tabs" class="navigate_selection_bar" />
                 <div class="user_bar">
-                    <span>当前用户：<el-tag v-if="currentUser" type="success" size="small">{{ currentUser }}</el-tag><el-tag v-else type="info" size="small">未登录</el-tag></span>
+                    <span>当前用户：<el-tag v-if="userStore.isLoggedIn" type="success" size="small">{{ userStore.username }}</el-tag><el-tag v-else type="info" size="small">未登录</el-tag></span>
                     <el-button type="danger" plain size="small" @click="handleLogout">退出登录</el-button>
                 </div>
                 <div class="news" v-if="tab === '动态'">
@@ -28,20 +28,17 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useUserStore } from '../stores/user';
 
 const router = useRouter();
-
-// 当前登录用户（从 localStorage 恢复“记住我”的登录状态）
-const currentUser = ref(localStorage.getItem('login_user') || '');
+const userStore = useUserStore();
 
 function handleLogout() {
     // 清掉凭证和用户信息，守卫会在下次跳转时把用户送回登录页
-    localStorage.removeItem('token');
-    localStorage.removeItem('login_user');
-    currentUser.value = '';
+    userStore.logout();
     router.push('/login');
 }
 

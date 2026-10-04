@@ -1,5 +1,6 @@
 import axios from "axios";
 import { router } from "../router";
+import { useUserStore } from "../stores/user";
 import { ErrorCode } from "./errorCode";
 
 export const req = axios.create({
@@ -7,17 +8,11 @@ export const req = axios.create({
     timeout: 5000,
 });
 
-// 本地凭证统一在这里清理，和 router/index.js 的守卫保持一致
-function clearAuth() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("login_user");
-}
-
 // 请求拦截器：自动携带 token
 // 在模块加载时注册一次即可，暴露成函数反复调用会重复注册拦截器。
 req.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem("token");
+        const { token } = useUserStore();
         if (token) config.headers.Authorization = `Bearer ${token}`;
         return config;
     },
@@ -31,7 +26,7 @@ req.interceptors.response.use(
 
         // 10002：未登录 / 登录已过期（错误码表要求前端跳登录页），清凭证后带上回跳地址
         if (body?.code === ErrorCode.UNAUTHORIZED) {
-            clearAuth();
+            useUserStore().logout();
             if (router.currentRoute.value.name !== "login") {
                 router.push({
                     name: "login",
@@ -53,7 +48,7 @@ req.interceptors.response.use(
             error.response?.data?.status === 401;
 
         if (is401) {
-            clearAuth();
+            useUserStore().logout();
             router.push({ name: "login" });
         }
 

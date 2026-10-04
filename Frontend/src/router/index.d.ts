@@ -4,9 +4,6 @@
  */
 import type { Router } from 'vue-router'
 
-/** 统一读取登录凭证，和 request.js 的请求拦截器保持一致 */
-export declare function getToken(): string | null
-
 /** 具名导出：api/request.js 的 401 处理需要用它做跳转 */
 export declare const router: Router
 

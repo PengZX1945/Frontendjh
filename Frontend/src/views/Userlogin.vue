@@ -53,13 +53,11 @@ import { useRoute, useRouter } from 'vue-router';
 import { AuthAlert, AuthButton, AuthInput, AuthShell } from '@/components/auth/export';
 import { login } from '../api/request';
 import { ErrorCode, resolveErrorMessage } from '@/api/errorCode';
+import { useUserStore } from '@/stores/user';
 
 const route = useRoute();
 const router = useRouter();
-
-const emit = defineEmits<{
-    (e: 'login-success', username: string): void;
-}>();
+const userStore = useUserStore();
 
 const form = reactive({
     username: '',
@@ -73,13 +71,9 @@ const message = ref('');
 // 进页面时回填账号：优先用注册页带过来的，其次是「记住我」留下的
 onMounted(() => {
     const fromQuery = route.query.username;
-    const remembered = localStorage.getItem('login_user');
 
-    if (typeof fromQuery === 'string' && fromQuery) {
-        form.username = fromQuery;
-    } else if (remembered) {
-        form.username = remembered;
-    }
+    form.username =
+        typeof fromQuery === 'string' && fromQuery ? fromQuery : userStore.getRememberedUsername();
 });
 
 // 登录不做前端校验，账号 / 密码是否正确交给后端判断
@@ -89,10 +83,8 @@ async function handleLogin() {
 
     loading.value = true;
     try {
-        const res = await login({
-            username: form.username.trim(),
-            password: form.password,
-        });
+        const username = form.username.trim();
+        const res = await login({ username, password: form.password });
 
         // 后端约定：code === 0 表示登录成功，其余错误码统一走错误码表（api/errorCode.ts）
         if (res?.code !== ErrorCode.SUCCESS) {
@@ -101,20 +93,19 @@ async function handleLogin() {
             return;
         }
 
-        // 保存 token，供请求拦截器自动携带
-        if (res?.data?.token) localStorage.setItem('token', res.data.token);
-
-        if (form.remember) {
-            localStorage.setItem('login_user', form.username);
-        } else {
-            localStorage.removeItem('login_user');
+        const token = res.data?.token;
+        if (!token) {
+            message.value = '登录失败，请稍后重试';
+            form.password = '';
+            return;
         }
-        // 通知父组件（如果父组件监听了该事件）
-        emit('login-success', form.username);
+
+        // 写入 store：内部会按「记住我」把登录态持久化到 localStorage / sessionStorage
+        userStore.setAuth({ token, username, remember: form.remember });
 
         // 跳回被守卫拦截前的页面；没有 redirect 就进首页
         const redirect = route.query.redirect;
-        router.push(typeof redirect === 'string' ? redirect : '/home');
+        router.push(typeof redirect === 'string' && redirect ? redirect : '/home');
     } catch (err) {
         message.value =
             err instanceof Error && err.message ? err.message : '登录失败，请稍后重试';
