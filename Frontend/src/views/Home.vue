@@ -1,119 +1,105 @@
 <template>
-    <div class="container">
-        <div class="display_block">
-            <div class="navigate_bar">
-                <el-segmented v-model="tab" :options="tabs" class="navigate_selection_bar" />
-                <div class="user_bar">
-                    <span>当前用户：<el-tag v-if="userStore.isLoggedIn" type="success" size="small">{{ userStore.username }}</el-tag><el-tag v-else type="info" size="small">未登录</el-tag></span>
-                    <el-button type="danger" plain size="small" @click="handleLogout">退出登录</el-button>
-                </div>
-                <div class="news" v-if="tab === '动态'">
-                    <el-empty v-if="!newslist.length" description="暂无动态" :image-size="80" />
-                    <el-card v-for="i in newslist" :key="i.id" class="news_card" shadow="hover">
+    <DefaultLayout>
+        <template #main>
+            <div class="home-page">
+                <!-- 筛选区：关键词 + 分类 -->
+                <section class="search-panel">
+                    <el-input v-model="keyword" class="search-keyword" placeholder="搜索关键词" clearable>
+                        <template #prefix>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round">
+                                <circle cx="11" cy="11" r="7" />
+                                <path d="m20 20-3.5-3.5" />
+                            </svg>
+                        </template>
+                    </el-input>
 
-                        <h4><b>{{ i.title }}</b></h4>
-                        <p><i>{{ i.content }}</i></p>
+                    <el-select v-model="category" class="search-category" placeholder="全部">
+                        <el-option v-for="item in categories" :key="item.value" :label="item.label"
+                            :value="item.value" />
+                    </el-select>
+                </section>
 
-                    </el-card>
-                </div>
-                <div class="news" v-if="tab === '投稿'">
-                    <el-empty v-if="!videoslist.length" description="暂无投稿" :image-size="80" />
-                    <el-card v-for="i in videoslist" :key="i.id" class="news_card" shadow="hover">
-                        <h4><b>{{ i.title }}</b></h4>
-                        <p><i>{{ i.content }}</i></p>
-                    </el-card>
-                </div>
+                <!-- 列表区：骨架占位，物品卡片后续在此渲染 -->
+                <section class="list-panel">
+                    <div class="list-placeholder">
+                        <p class="placeholder-title">物品列表区域</p>
+                        <p class="placeholder-desc">物品卡片将在此处渲染</p>
+                    </div>
+                </section>
             </div>
-        </div>
-    </div>
+        </template>
+    </DefaultLayout>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useUserStore } from '../stores/user';
+import DefaultLayout from '../layouts/DefaultLayout.vue';
 
-const router = useRouter();
-const userStore = useUserStore();
+const keyword = ref('');
+const category = ref('');
 
-function handleLogout() {
-    // 清掉凭证和用户信息，守卫会在下次跳转时把用户送回登录页
-    userStore.logout();
-    router.push('/login');
-}
-
-const tab = ref("动态");
-const tabs = ["动态", "投稿"];
-
-const newslist = ref([
-    { id: 1, title: "动态1", content: "动态1的内容" },
-    { id: 2, title: "动态2", content: "动态2的内容" },
-    { id: 3, title: "动态3", content: "动态3的内容" },
-])
-const videoslist = ref([
-    { id: 1, title: "投稿1", content: "投稿1的内容" },
-    { id: 2, title: "投稿2", content: "投稿2的内容" },
-    { id: 3, title: "投稿3", content: "投稿3的内容" },
-])
+/** 分类筛选项，先给静态骨架数据 */
+const categories = [
+    { label: '全部', value: '' },
+    { label: '证件卡片', value: 'card' },
+    { label: '电子产品', value: 'electronic' },
+    { label: '生活用品', value: 'daily' },
+    { label: '其他', value: 'other' }
+];
 </script>
 
 <style scoped>
-.container {
+.home-page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px 16px 40px;
+    box-sizing: border-box;
+}
+
+.search-panel {
     display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 20px;
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.search-keyword {
+    width: 240px;
+}
+
+.search-category {
+    width: 140px;
+}
+
+.list-panel {
+    margin-top: 20px;
+}
+
+.list-placeholder {
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 100%;
+    gap: 8px;
+    min-height: 320px;
+    background: #fff;
+    border: 1px dashed #dcdfe6;
+    border-radius: 6px;
+    color: #909399;
 }
 
-.display_block {
-    width: 300px;
-    height: 500px;
-    border: 2px solid black;
-    /* 让内部区域可以按剩余高度分配，卡片列表才能滚动 */
-    display: flex;
-    flex-direction: column;
-}
-
-.navigate_bar {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
-    margin-bottom: 10px;
-}
-
-.navigate_selection_bar {
-    width: 100%;
-}
-
-.news {
-    width: 100%;
-    text-align: left;
-    /* 卡片内容超出 500px 的容器时自己滚动，别把外框撑破 */
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-}
-
-.user_bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 8px;
-    font-size: 13px;
-    color: gray;
-}
-
-.news_card {
-    margin-bottom: 8px;
-}
-
-.news_card h4 {
-    margin: 0 0 6px;
-}
-
-.news_card p {
+.placeholder-title {
     margin: 0;
+    font-size: 15px;
+    color: #606266;
+}
+
+.placeholder-desc {
+    margin: 0;
+    font-size: 13px;
 }
 </style>

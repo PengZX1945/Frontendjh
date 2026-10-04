@@ -1,0 +1,131 @@
+<template>
+    <header class="nav-bar">
+        <div class="nav-inner">
+            <!-- 左侧：平台 logo + 名称 -->
+            <div class="brand">
+                <span class="brand-logo" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="7" width="18" height="13" rx="2" />
+                        <path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7" />
+                        <path d="M3 12h18" />
+                    </svg>
+                </span>
+                <span class="brand-name">失物招领平台</span>
+            </div>
+
+            <!-- 中间：主导航，先做静态骨架，后续接入各页面路由 -->
+            <nav class="nav-links">
+                <a v-for="item in navLinks" :key="item.key" class="nav-link"
+                    :class="{ 'is-active': item.key === activeKey }"
+                    :aria-current="item.key === activeKey ? 'page' : undefined"
+                    href="#" @click.prevent>{{ item.label }}</a>
+            </nav>
+
+            <!-- 右侧：登录入口 -->
+            <div class="nav-actions">
+                <el-button type="primary" size="small" @click="goLogin">登录</el-button>
+            </div>
+        </div>
+    </header>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+/** 顶部导航项，当前仅作骨架展示，路由待各页面就绪后再接入 */
+const navLinks = [
+    { key: 'found', label: '招领启事' },
+    { key: 'lost', label: '寻物启事' },
+    { key: 'publish', label: '发布' },
+    { key: 'mine', label: '我的' }
+];
+
+const activeKey = ref('found');
+
+function goLogin(): void {
+    router.push('/login');
+}
+</script>
+
+<style scoped>
+.nav-bar {
+    background: #fff;
+    border-bottom: 1px solid #ebeef5;
+}
+
+.nav-inner {
+    display: flex;
+    align-items: center;
+    gap: 56px;
+    height: 54px;
+    padding: 0 30px;
+    box-sizing: border-box;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.brand-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    background: #409eff;
+    color: #fff;
+}
+
+.brand-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #303133;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.nav-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 54px;
+    font-size: 14px;
+    color: #606266;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    color: #409eff;
+}
+
+.nav-link.is-active {
+    color: #409eff;
+    font-weight: 500;
+}
+
+.nav-link.is-active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    border-radius: 1px;
+    background: #409eff;
+}
+
+.nav-actions {
+    margin-left: auto;
+}
+</style>

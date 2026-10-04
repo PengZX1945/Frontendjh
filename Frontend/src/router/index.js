@@ -30,9 +30,9 @@ const routes = [
                 meta: { needLogin: false }
             },
             {
-                path: 'ItemDetaills',
-                name: 'ItemDetaills',
-                component: () => import('../views/ItemDetaills.vue'),
+                path: 'ItemDetails',
+                name: 'ItemDetails',
+                component: () => import('../views/ItemDetails.vue'),
                 meta: { needLogin: false }
             },
             {
