@@ -86,6 +86,7 @@ const categories = [
     justify-content: center;
     gap: 8px;
     min-height: 320px;
+    height: 500px;
     background: #fff;
     border: 1px dashed #dcdfe6;
     border-radius: 6px;

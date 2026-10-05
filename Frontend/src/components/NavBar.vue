@@ -22,9 +22,29 @@
                     href="#" @click.prevent>{{ item.label }}</a>
             </nav>
 
-            <!-- 右侧：登录入口 -->
+            <!-- 右侧：未登录显示登录/注册入口；已登录（含管理员）显示方形头像 + 悬停菜单 -->
             <div class="nav-actions">
-                <el-button type="primary" size="small" @click="goLogin">登录</el-button>
+                <el-dropdown v-if="!userStore.isLoggedIn" placement="bottom">
+                    <el-button type="warning" size="small" @click="goLogin"> 未登录 </el-button>
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item @click="goLogin">登录</el-dropdown-item>
+                            <el-dropdown-item @click="goRegister">注册</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
+
+                <el-dropdown v-else trigger="hover" placement="bottom-end" @command="handleUserCommand">
+                    <span class="user-avatar" role="button" tabindex="0" aria-label="用户菜单">
+                        <el-avatar :size="32" shape="square" class="avatar-box" />
+                    </span>
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item command="profile">用户信息</el-dropdown-item>
+                            <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
             </div>
         </div>
     </header>
@@ -33,8 +53,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useUserStore } from '../stores/user';
 
 const router = useRouter();
+const userStore = useUserStore();
 
 /** 顶部导航项，当前仅作骨架展示，路由待各页面就绪后再接入 */
 const navLinks = [
@@ -48,6 +70,19 @@ const activeKey = ref('found');
 
 function goLogin(): void {
     router.push('/login');
+}
+function goRegister(): void {
+    router.push('/register');
+}
+
+/** 头像下拉菜单：退出登录复用 store 的登出逻辑，管理员与普通用户一致 */
+function handleUserCommand(command: string): void {
+    if (command === 'logout') {
+        userStore.logout();
+        router.push('/login');
+        return;
+    }
+    // 'profile'：用户信息页尚未实现，先留空
 }
 </script>
 
@@ -127,5 +162,17 @@ function goLogin(): void {
 
 .nav-actions {
     margin-left: auto;
+}
+
+.user-avatar {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.avatar-box {
+    /* 默认空白头像：给浅灰底，占位更明显 */
+    background: #dcdfe6;
+    border-radius: 6px;
 }
 </style>

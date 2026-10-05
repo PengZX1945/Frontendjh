@@ -118,8 +118,6 @@ async function handleLogin() {
 
 
 <style scoped>
-/* 只保留登录页独有的样式，外壳 / 输入框 / 按钮样式见 components/auth */
-
 .subtitle {
     margin: 0 0 18px;
     font-size: 13px;

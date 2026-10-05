@@ -5,12 +5,11 @@
             <slot name="main" />
         </main>
         <footer class="footer">
-            <!-- 页面不传 footer 插槽时，用这里的默认页脚 -->
+            <!-- 页面不传 footer 插槽时，用默认页脚 -->
             <slot name="footer">
                 <div class="footer-inner">
-                    <p class="footer-brand">失物招领平台</p>
                     <p class="footer-note">校园失物招领系统 · 让每一件失物都能回家</p>
-                    <p class="footer-copy">© 2026 失物招领平台 All Rights Reserved</p>
+                    <p class="footer-copy">© 大作业第六组</p>
                 </div>
             </slot>
         </footer>
@@ -38,7 +37,7 @@ import NavBar from '../components/NavBar.vue';
 .footer {
     background: #fff;
     border-top: 1px solid #ebeef5;
-    padding: 24px 16px;
+    padding: 16px 12px;
 }
 
 .footer-inner {
