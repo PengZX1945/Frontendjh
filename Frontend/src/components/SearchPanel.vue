@@ -11,30 +11,18 @@
         </el-input>
 
         <el-select v-model="category" class="search-category" placeholder="全部">
-            <el-option v-for="item in categories" :key="item.value" :label="item.label" :value="item.value" />
+            <el-option label="全部" value="" />
+            <el-option v-for="item in ITEM_CATEGORIES" :key="item" :label="item" :value="item" />
         </el-select>
     </section>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ITEM_CATEGORIES } from '../api/itemMeta';
 
-const keyword = ref('');
-const category = ref('');
-
-/** 分类筛选项，先给静态骨架数据 */
-const categories = [
-    { label: '全部', value: '' },
-    { label: '卡证', value: 'card' },
-    { label: '数码电子', value: 'electronic' },
-    { label: '挂饰饰品', value: 'accessory' },
-    { label: '箱包', value: 'bag' },
-    { label: '衣物', value: 'clothing' },
-    { label: '钥匙', value: 'key' },
-    { label: '现金钱包', value: 'wallet' },
-    { label: '书籍文具', value: 'book' },
-    { label: '其他', value: 'other' }
-];
+// 搜索条件交给父页面持有，改动后由父页面重新拉列表
+const keyword = defineModel<string>('keyword', { default: '' });
+const category = defineModel<string>('category', { default: '' });
 </script>
 
 <style scoped>

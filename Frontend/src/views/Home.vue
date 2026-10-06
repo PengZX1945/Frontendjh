@@ -2,7 +2,7 @@
     <DefaultLayout>
         <template #main>
             <div class="home-page">
-                <!-- 列表 / 发布等子页面都在这里切换 -->
+
                 <router-view />
             </div>
         </template>

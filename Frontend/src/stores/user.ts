@@ -11,7 +11,6 @@ const ROLE_KEY = 'role'
 /** 「记住我」保存的账号，只用于登录页回填，退出登录时不清除 */
 const REMEMBERED_USERNAME_KEY = 'login_user'
 
-/** 勾选「记住我」写 localStorage（关浏览器仍保留），否则写 sessionStorage（关浏览器即失效） */
 const STORAGES = [localStorage, sessionStorage]
 
 function readFromStorages(key: string): string {
@@ -53,7 +52,7 @@ export const useUserStore = defineStore('user', () => {
     remember.value = nextRemember
     role.value = nextRole
 
-    // 先清掉两个 storage 里的旧值，避免上次「记住我」的残留覆盖本次选择
+    // 先清掉三个 storage 里的旧值，避免上次「记住我」的残留覆盖本次选择
     removeFromStorages(TOKEN_KEY)
     removeFromStorages(USERNAME_KEY)
     removeFromStorages(ROLE_KEY)
