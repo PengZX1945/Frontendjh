@@ -7,12 +7,12 @@
 import { ErrorCode } from './errorCode'
 import type { AuthResult } from './request'
 
-/** 账号角色：普通用户 / 管理员 */
+/** 账号角色：用户 / 管理员 */
 export type UserRole = 'user' | 'admin'
 
 /** 角色中文名，页面上展示用 */
 export const ROLE_LABEL: Record<UserRole, string> = {
-  user: '普通用户',
+  user: '用户',
   admin: '管理员',
 }
 
@@ -29,7 +29,7 @@ export interface LocalAccount {
 
 /** 内置的本地账号：一个默认用户 + 一个管理员 */
 export const LOCAL_ACCOUNTS: readonly LocalAccount[] = [
-  { username: 'testuser', password: '123456', role: 'user', nickname: '默认用户' },
+  { username: 'testuser', password: '123456', role: 'user', nickname: '用户user' },
   { username: 'admin', password: 'admin123', role: 'admin', nickname: '管理员' },
 ]
 

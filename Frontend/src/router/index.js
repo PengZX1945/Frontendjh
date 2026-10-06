@@ -22,29 +22,37 @@ const routes = [
         component: () => import("../views/Home.vue"),
         // 父路由标记后，所有子路由都受保护（靠 to.matched 判断）
         meta: { needLogin: false },
+        // 进首页默认落在招领启事列表
+        redirect: { name: 'found' },
         children: [
             {
-                path: "FoundList", // 子路由用相对路径，最终地址为 /app/User
-                name: "FoundList",
-                component: () => import("../views/FoundList.vue"),
+                path: 'found',
+                name: 'found',
+                component: () => import('../views/FoundList.vue'),
                 meta: { needLogin: false }
             },
             {
-                path: 'ItemDetails',
-                name: 'ItemDetails',
-                component: () => import('../views/ItemDetails.vue'),
-                meta: { needLogin: false }
-            },
-            {
-                path: 'LostList',
-                name: 'LostList',
+                path: 'lost',
+                name: 'lost',
                 component: () => import('../views/LostList.vue'),
                 meta: { needLogin: false }
             },
             {
-                path: 'MyItems',
-                name: 'MyItems',
+                path: 'details/:id',
+                name: 'details',
+                component: () => import('../views/ItemDetails.vue'),
+                meta: { needLogin: false }
+            },
+            {
+                path: 'myitems',
+                name: 'myitems',
                 component: () => import('../views/MyItems.vue'),
+                meta: { needLogin: true }
+            },
+            {
+                path: 'additem',
+                name: 'additem',
+                component: () => import('../views/AddItem.vue'),
                 meta: { needLogin: true }
             }
         ]

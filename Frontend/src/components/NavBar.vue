@@ -14,12 +14,10 @@
                 <span class="brand-name">失物招领平台</span>
             </div>
 
-            <!-- 中间：主导航，先做静态骨架，后续接入各页面路由 -->
+            <!-- 中间：主导航，切换 main 区的子路由 -->
             <nav class="nav-links">
-                <a v-for="item in navLinks" :key="item.key" class="nav-link"
-                    :class="{ 'is-active': item.key === activeKey }"
-                    :aria-current="item.key === activeKey ? 'page' : undefined"
-                    href="#" @click.prevent>{{ item.label }}</a>
+                <router-link v-for="item in navLinks" :key="item.key" class="nav-link"
+                    :to="{ name: item.routeName }" active-class="is-active">{{ item.label }}</router-link>
             </nav>
 
             <!-- 右侧：未登录显示登录/注册入口；已登录（含管理员）显示方形头像 + 悬停菜单 -->
@@ -41,7 +39,7 @@
                     <template #dropdown>
                         <el-dropdown-menu>
                             <el-dropdown-item disabled>
-                                当前身份：{{ userStore.username }}（{{ ROLE_LABEL[userStore.role] }}）
+                                {{ userStore.username }}（{{ ROLE_LABEL[userStore.role] }}）
                             </el-dropdown-item>
                             <el-dropdown-item command="profile">用户信息</el-dropdown-item>
                             <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
@@ -54,7 +52,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { ROLE_LABEL } from '../api/localAccounts';
 import { useUserStore } from '../stores/user';
@@ -62,15 +59,13 @@ import { useUserStore } from '../stores/user';
 const router = useRouter();
 const userStore = useUserStore();
 
-/** 顶部导航项 */
+/** 顶部导航项：routeName 对应 router 里的子路由名 */
 const navLinks = [
-    { key: 'found', label: '招领启事' },
-    { key: 'lost', label: '寻物启事' },
-    { key: 'publish', label: '发布' },
-    { key: 'mine', label: '我的' }
+    { key: 'found', label: '招领启事', routeName: 'found' },
+    { key: 'lost', label: '寻物启事', routeName: 'lost' },
+    { key: 'publish', label: '发布', routeName: 'additem' },
+    { key: 'mine', label: '我的', routeName: 'myitems' }
 ];
-
-const activeKey = ref('found');
 
 function goLogin(): void {
     router.push('/login');
