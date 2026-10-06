@@ -10,13 +10,9 @@ export type ItemType = 'found' | 'lost';
 export const ItemStatus = {
   /** 待审核：刚创建，审核通过后才公开 */
   PENDING: 0,
-  /** 已发布 */
   PUBLISHED: 1,
-  /** 已驳回 */
   REJECTED: 2,
-  /** 已认领 */
   CLAIMED: 3,
-  /** 已关闭 */
   CLOSED: 4,
 } as const;
 
@@ -85,14 +81,10 @@ export interface ItemListQuery {
   category?: string;
 }
 
-/** 后端统一响应结构：code === 0 表示成功 */
-export interface ApiResponse<T> {
-  code: number;
-  msg?: string;
-  data?: T | null;
-}
+/** 后端统一响应结构，定义在 api/apiTypes.ts，这里转出方便按帖子模块导入 */
+export type { ApiResponse } from './apiTypes';
 
-/** Date → "YYYY-MM-DD HH:mm:ss" */
+/** 日期 → "AAAA-BB-CC DD:ee:ff" */
 export function toDateTimeString(date: Date): string {
   const pad = (value: number): string => String(value).padStart(2, '0');
   const ymd = [date.getFullYear(), pad(date.getMonth() + 1), pad(date.getDate())].join('-');
@@ -105,7 +97,7 @@ export function formatItemTime(time: string): string {
   return time ? time.slice(0, 16) : '';
 }
 
-/** 角色过滤：用户只能看到已发布 / 已认领 */
+/** 角色过滤：用户只能看到已发布 / 已认领 / 自己发布的帖子 */
 export function filterVisibleItems(items: Item[], isAdmin: boolean): Item[] {
   if (isAdmin) return items;
   return items.filter((item) => USER_VISIBLE_STATUSES.includes(item.status));

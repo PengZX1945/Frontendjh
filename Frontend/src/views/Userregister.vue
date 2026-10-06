@@ -28,7 +28,7 @@
         icon="lock"
         type="password"
         name="password"
-        placeholder="6-64 位，不能包含特殊符号"
+        placeholder="8-64 位，不能包含特殊符号"
         autocomplete="new-password"
         :maxlength="64"
         :error="errors.password"

@@ -33,7 +33,7 @@ const category = ref('');
 const items = ref<Item[]>([]);
 const loading = ref(false);
 
-/** 管理员能看到所有帖子，普通用户只看已发布 / 已认领 */
+/** 管理员能看到所有帖子，普通用户只看已发布 / 已认领 / 自己发布的帖子 */
 const visibleItems = computed(() => filterVisibleItems(items.value, userStore.isAdmin));
 
 async function load(): Promise<void> {

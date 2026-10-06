@@ -8,6 +8,12 @@ const TOKEN_KEY = 'token'
 const USERNAME_KEY = 'current_user'
 /** 当前登录用户角色的存储键 */
 const ROLE_KEY = 'role'
+/** 当前登录用户昵称的存储键 */
+const NICKNAME_KEY = 'nickname'
+/** 当前登录用户电话的存储键 */
+const CONTACT_KEY = 'contact'
+/** 当前登录用户 ID 的存储键：1.5 / 1.6 的 user_id 取自这里 */
+const USER_ID_KEY = 'user_id'
 /** 「记住我」保存的账号，只用于登录页回填，退出登录时不清除 */
 const REMEMBERED_USERNAME_KEY = 'login_user'
 
@@ -21,12 +27,23 @@ function removeFromStorages(key: string): void {
   STORAGES.forEach((storage) => storage.removeItem(key))
 }
 
+/** 登录态可能存在 localStorage 也可能在 sessionStorage，按 token 判断当前用的是哪个 */
+function activeStorage(): Storage {
+  return localStorage.getItem(TOKEN_KEY) ? localStorage : sessionStorage
+}
+
 export interface AuthPayload {
   token: string
   username: string
   remember?: boolean
   /** 账号角色，不传按普通用户处理 */
   role?: UserRole
+  /** 昵称，登录接口返回时一并存入 */
+  nickname?: string
+  /** 联系电话，登录接口返回时一并存入 */
+  contact?: string
+  /** 用户 ID，登录接口返回时一并存入；接口 1.4 也会补上 */
+  id?: number
 }
 
 export const useUserStore = defineStore('user', () => {
@@ -35,6 +52,9 @@ export const useUserStore = defineStore('user', () => {
   const username = ref(readFromStorages(USERNAME_KEY))
   // 刷新后角色同样从 storage 恢复，管理员身份才不会丢
   const role = ref<UserRole>(resolveRole(readFromStorages(ROLE_KEY)))
+  const nickname = ref(readFromStorages(NICKNAME_KEY))
+  const contact = ref(readFromStorages(CONTACT_KEY))
+  const userId = ref(Number(readFromStorages(USER_ID_KEY)) || 0)
   const remember = ref(Boolean(localStorage.getItem(TOKEN_KEY)))
 
   const isLoggedIn = computed(() => Boolean(token.value))
@@ -46,21 +66,33 @@ export const useUserStore = defineStore('user', () => {
     username: nextUsername,
     remember: nextRemember = false,
     role: nextRole = 'user',
+    nickname: nextNickname = '',
+    contact: nextContact = '',
+    id: nextId = 0,
   }: AuthPayload): void {
     token.value = nextToken
     username.value = nextUsername
     remember.value = nextRemember
     role.value = nextRole
+    nickname.value = nextNickname
+    contact.value = nextContact
+    userId.value = nextId
 
-    // 先清掉三个 storage 里的旧值，避免上次「记住我」的残留覆盖本次选择
+    // 先清掉 storage 里的旧值，避免上次「记住我」的残留覆盖本次选择
     removeFromStorages(TOKEN_KEY)
     removeFromStorages(USERNAME_KEY)
     removeFromStorages(ROLE_KEY)
+    removeFromStorages(NICKNAME_KEY)
+    removeFromStorages(CONTACT_KEY)
+    removeFromStorages(USER_ID_KEY)
 
     const storage = nextRemember ? localStorage : sessionStorage
     storage.setItem(TOKEN_KEY, nextToken)
     storage.setItem(USERNAME_KEY, nextUsername)
     storage.setItem(ROLE_KEY, nextRole)
+    storage.setItem(NICKNAME_KEY, nextNickname)
+    storage.setItem(CONTACT_KEY, nextContact)
+    storage.setItem(USER_ID_KEY, String(nextId))
 
     if (nextRemember) {
       localStorage.setItem(REMEMBERED_USERNAME_KEY, nextUsername)
@@ -69,16 +101,38 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  /** 保存个人信息：昵称 / 电话写回当前登录态所在的 storage */
+  function setProfile(nextNickname: string, nextContact: string): void {
+    nickname.value = nextNickname
+    contact.value = nextContact
+
+    const storage = activeStorage()
+    storage.setItem(NICKNAME_KEY, nextNickname)
+    storage.setItem(CONTACT_KEY, nextContact)
+  }
+
+  /** 记录用户 ID：接口 1.4 返回后写入，供 1.5 / 1.6 的 user_id 使用 */
+  function setUserId(nextId: number): void {
+    userId.value = nextId
+    activeStorage().setItem(USER_ID_KEY, String(nextId))
+  }
+
   /** 退出登录 / 登录态失效：清空内存状态和两个 storage 里的凭证 */
   function logout(): void {
     token.value = ''
     username.value = ''
     remember.value = false
     role.value = 'user'
+    nickname.value = ''
+    contact.value = ''
+    userId.value = 0
 
     removeFromStorages(TOKEN_KEY)
     removeFromStorages(USERNAME_KEY)
     removeFromStorages(ROLE_KEY)
+    removeFromStorages(NICKNAME_KEY)
+    removeFromStorages(CONTACT_KEY)
+    removeFromStorages(USER_ID_KEY)
   }
 
   /** 登录页回填账号：没有注册页带来的 query 时，就用「记住我」存下的账号 */
@@ -90,10 +144,15 @@ export const useUserStore = defineStore('user', () => {
     token,
     username,
     role,
+    nickname,
+    contact,
+    userId,
     remember,
     isLoggedIn,
     isAdmin,
     setAuth,
+    setProfile,
+    setUserId,
     logout,
     getRememberedUsername,
   }

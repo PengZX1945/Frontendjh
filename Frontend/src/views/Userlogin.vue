@@ -23,7 +23,7 @@
         icon="lock"
         type="password"
         name="password"
-        placeholder="6-64 位，不能包含特殊符号"
+        placeholder="8-64 位，不能包含特殊符号"
         autocomplete="current-password"
         :error="errors.password"
         @input="clearFieldError('password')"
@@ -154,6 +154,8 @@ async function handleLogin() {
             username,
             remember: form.remember,
             role: resolveRole(res.data?.role),
+            nickname: typeof res.data?.nickname === 'string' ? res.data.nickname : '',
+            contact: typeof res.data?.contact === 'string' ? res.data.contact : '',
         });
 
         // 跳回被守卫拦截前的页面；没有 redirect 就进首页

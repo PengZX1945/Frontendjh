@@ -5,7 +5,7 @@
 
 /** 账号：4-16 位，只能用字母、数字、下划线 */
 const error_username = /^[A-Za-z0-9_]{4,32}$/
-const error_password = /^[A-Za-z0-9_]{6,64}$/
+const error_password = /^[A-Za-z0-9_]{8,64}$/
 
 
 /**
@@ -29,7 +29,7 @@ export function validateRegisterUsername(value: string): string {
 export function validatePassword(value: string): string {
   if (!value) return '请输入密码'
   if (/\s/.test(value)) return '密码不能包含空格'
-  if (value.length < 6) return '密码长度不能少于 6 位'
+  if (value.length < 8) return '密码长度不能少于 8 位'
   if (value.length > 64) return '密码长度不能超过 64 位'
   if (!error_password.test(value)) return '密码不能包含特殊字符与空格'
   return ''

@@ -39,7 +39,7 @@
                     <template #dropdown>
                         <el-dropdown-menu>
                             <el-dropdown-item disabled>
-                                {{ userStore.username }}（{{ ROLE_LABEL[userStore.role] }}）
+                                {{ userStore.nickname || userStore.username }}（{{ ROLE_LABEL[userStore.role] }}）
                             </el-dropdown-item>
                             <el-dropdown-item command="profile">用户信息</el-dropdown-item>
                             <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
@@ -48,16 +48,23 @@
                 </el-dropdown>
             </div>
         </div>
+
+        <ProfileDialog v-model="profileVisible" />
     </header>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import ProfileDialog from './ProfileDialog.vue';
 import { ROLE_LABEL } from '../api/localAccounts';
 import { useUserStore } from '../stores/user';
 
 const router = useRouter();
 const userStore = useUserStore();
+
+/** 个人信息弹窗开关 */
+const profileVisible = ref(false);
 
 /** 顶部导航项：routeName 对应 router 里的子路由名 */
 const navLinks = [
@@ -76,6 +83,11 @@ function goRegister(): void {
 
 /** 头像下拉菜单：退出登录复用 store 的登出逻辑，管理员与普通用户一致 */
 function handleUserCommand(command: string): void {
+    if (command === 'profile') {
+        profileVisible.value = true;
+        return;
+    }
+
     if (command === 'logout') {
         userStore.logout();
         router.push('/login');
