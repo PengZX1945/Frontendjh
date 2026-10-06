@@ -41,6 +41,15 @@
       <AuthButton :loading="loading" loading-text="登录中…">登 录</AuthButton>
     </form>
 
+    <!-- 本地调试账号：切到真实后端（USE_LOCAL_LOGIN = false）后自动隐藏 -->
+    <div v-if="USE_LOCAL_LOGIN" class="local-accounts">
+      <p class="local-accounts__title">本地调试账号</p>
+      <p v-for="account in LOCAL_ACCOUNTS" :key="account.username" class="local-accounts__item">
+        <b>{{ account.username }}</b> / {{ account.password }}
+        <span class="local-accounts__role">{{ ROLE_LABEL[account.role] }}</span>
+      </p>
+    </div>
+
     <p class="switch">
       没有账号？<RouterLink class="link" to="/register">立即注册</RouterLink>
     </p>
@@ -53,11 +62,15 @@ import { useRoute, useRouter } from 'vue-router';
 import { AuthAlert, AuthButton, AuthInput, AuthShell } from '@/components/auth/export';
 import { login } from '../api/request';
 import { ErrorCode, resolveErrorMessage } from '@/api/errorCode';
+import { LOCAL_ACCOUNTS, ROLE_LABEL, localLogin, resolveRole } from '@/api/localAccounts';
 import { useUserStore } from '@/stores/user';
 
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
+
+/** 后端 /api 还没接入时走本地账号（见 api/localAccounts.ts）；联调时改成 false 即请求真实接口 */
+const USE_LOCAL_LOGIN = true;
 
 const form = reactive({
     username: '',
@@ -84,7 +97,9 @@ async function handleLogin() {
     loading.value = true;
     try {
         const username = form.username.trim();
-        const res = await login({ username, password: form.password });
+        const res = USE_LOCAL_LOGIN
+            ? await localLogin({ username, password: form.password })
+            : await login({ username, password: form.password });
 
         // 后端约定：code === 0 表示登录成功，其余错误码统一走错误码表（api/errorCode.ts）
         if (res?.code !== ErrorCode.SUCCESS) {
@@ -94,14 +109,19 @@ async function handleLogin() {
         }
 
         const token = res.data?.token;
-        if (!token) {
+        if (typeof token !== 'string' || !token) {
             message.value = '登录失败，请稍后重试';
             form.password = '';
             return;
         }
 
         // 写入 store：内部会按「记住我」把登录态持久化到 localStorage / sessionStorage
-        userStore.setAuth({ token, username, remember: form.remember });
+        userStore.setAuth({
+            token,
+            username,
+            remember: form.remember,
+            role: resolveRole(res.data?.role),
+        });
 
         // 跳回被守卫拦截前的页面；没有 redirect 就进首页
         const redirect = route.query.redirect;
@@ -151,5 +171,37 @@ async function handleLogin() {
     margin: 16px 0 0;
     font-size: 13px;
     color: #475569;
+}
+
+/* 本地调试账号提示，只在前端自测时出现 */
+.local-accounts {
+    margin-top: 16px;
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #64748b;
+    text-align: left;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+}
+
+.local-accounts__title {
+    margin: 0;
+    font-weight: 600;
+    color: #475569;
+}
+
+.local-accounts__item {
+    margin: 0;
+}
+
+.local-accounts__role {
+    margin-left: 6px;
+    padding: 0 6px;
+    font-size: 11px;
+    color: #2563eb;
+    background: #eff6ff;
+    border-radius: 4px;
 }
 </style>

@@ -40,6 +40,9 @@
                     </span>
                     <template #dropdown>
                         <el-dropdown-menu>
+                            <el-dropdown-item disabled>
+                                当前身份：{{ userStore.username }}（{{ ROLE_LABEL[userStore.role] }}）
+                            </el-dropdown-item>
                             <el-dropdown-item command="profile">用户信息</el-dropdown-item>
                             <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
                         </el-dropdown-menu>
@@ -53,12 +56,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { ROLE_LABEL } from '../api/localAccounts';
 import { useUserStore } from '../stores/user';
 
 const router = useRouter();
 const userStore = useUserStore();
 
-/** 顶部导航项，当前仅作骨架展示，路由待各页面就绪后再接入 */
+/** 顶部导航项 */
 const navLinks = [
     { key: 'found', label: '招领启事' },
     { key: 'lost', label: '寻物启事' },

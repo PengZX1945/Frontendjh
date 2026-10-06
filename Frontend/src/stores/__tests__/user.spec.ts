@@ -86,4 +86,38 @@ describe('user store persistence', () => {
     expect(env.local.getItem('current_user')).toBeNull()
     expect(store.getRememberedUsername()).toBe('carol')
   })
+
+  it('persists the admin role and restores it on refresh', () => {
+    const store = useUserStore()
+    store.setAuth({ token: 't4', username: 'admin', remember: false, role: 'admin' })
+
+    expect(store.role).toBe('admin')
+    expect(store.isAdmin).toBe(true)
+    expect(env.session.getItem('role')).toBe('admin')
+    expect(env.local.getItem('role')).toBeNull()
+
+    // 模拟刷新页面：角色应同样从 storage 恢复
+    setActivePinia(createPinia())
+    const restored = useUserStore()
+    expect(restored.role).toBe('admin')
+    expect(restored.isAdmin).toBe(true)
+
+    // 退出登录后回到普通用户，storage 里的角色也清掉
+    restored.logout()
+    expect(restored.role).toBe('user')
+    expect(restored.isAdmin).toBe(false)
+    expect(env.session.getItem('role')).toBeNull()
+  })
+
+  it('falls back to the normal user role when role is missing or unknown', () => {
+    const store = useUserStore()
+    store.setAuth({ token: 't5', username: 'dave', remember: true })
+
+    expect(store.role).toBe('user')
+    expect(store.isAdmin).toBe(false)
+    expect(env.local.getItem('role')).toBe('user')
+
+    store.setAuth({ token: 't6', username: 'dave', remember: true, role: undefined })
+    expect(store.role).toBe('user')
+  })
 })
