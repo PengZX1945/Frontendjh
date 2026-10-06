@@ -39,6 +39,8 @@
         :maxlength="maxlength"
         :aria-invalid="!!error"
         :aria-describedby="error ? `${id}-error` : undefined"
+        @input="emit('input')"
+        @blur="emit('blur')"
       />
 
       <button
@@ -69,7 +71,7 @@
         </svg>
       </button>
     </div>
-
+    <!-- 报错↓ -->
     <p v-if="error" :id="`${id}-error`" class="field__error">{{ error }}</p>
   </div>
 </template>
@@ -79,6 +81,12 @@ import { computed, ref } from 'vue'
 
 /** 支持 v-model 的双向绑定 */
 const model = defineModel<string>({ default: '' })
+
+/** 把输入 / 失焦事件透出去，页面可以据此做即时校验（输入时清错、失焦时校验） */
+const emit = defineEmits<{
+  (e: 'input'): void
+  (e: 'blur'): void
+}>()
 
 const props = withDefaults(
   defineProps<{

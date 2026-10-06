@@ -9,8 +9,11 @@
         label="账号"
         icon="user"
         name="username"
-        placeholder="请输入账号"
+        placeholder="4-32 位字母、数字或下划线"
         autocomplete="username"
+        :error="errors.username"
+        @input="clearFieldError('username')"
+        @blur="checkUsername"
       />
 
       <AuthInput
@@ -20,8 +23,11 @@
         icon="lock"
         type="password"
         name="password"
-        placeholder="请输入密码"
+        placeholder="6-64 位，不能包含特殊符号"
         autocomplete="current-password"
+        :error="errors.password"
+        @input="clearFieldError('password')"
+        @blur="checkPassword"
       />
 
       <div class="row">
@@ -64,6 +70,7 @@ import { login } from '../api/request';
 import { ErrorCode, resolveErrorMessage } from '@/api/errorCode';
 import { LOCAL_ACCOUNTS, ROLE_LABEL, localLogin, resolveRole } from '@/api/localAccounts';
 import { useUserStore } from '@/stores/user';
+import { validateLoginUsername, validatePassword } from '@/utils/validators';
 
 const route = useRoute();
 const router = useRouter();
@@ -80,6 +87,31 @@ const form = reactive({
 
 const loading = ref(false);
 const message = ref('');
+const errors = reactive({ username: '', password: '' });
+
+/** 失焦时即时提示，提交前再统一校验一次 */
+function checkUsername(): boolean {
+    form.username = form.username.trim();
+    errors.username = validateLoginUsername(form.username);
+    return !errors.username;
+}
+function checkPassword(): boolean {
+    errors.password = validatePassword(form.password);
+    return !errors.password;
+}
+
+/** 提交前校验整个表单，不通过就不发请求 */
+function validate(): boolean {
+    const usernameValid = checkUsername();
+    const passwordValid = checkPassword();
+    return usernameValid && passwordValid;
+}
+
+/** 用户开始修改字段时清掉报错，避免旧提示一直挂着 */
+function clearFieldError(field: 'username' | 'password'): void {
+    errors[field] = '';
+    message.value = '';
+}
 
 // 进页面时回填账号：优先用注册页带过来的，其次是「记住我」留下的
 onMounted(() => {
@@ -89,10 +121,11 @@ onMounted(() => {
         typeof fromQuery === 'string' && fromQuery ? fromQuery : userStore.getRememberedUsername();
 });
 
-// 登录不做前端校验，账号 / 密码是否正确交给后端判断
+// 登录先做格式校验（避免明显不合法的账号 / 密码发到后端），账号密码是否正确仍由后端判断
 async function handleLogin() {
     if (loading.value) return;
     message.value = '';
+    if (!validate()) return;
 
     loading.value = true;
     try {

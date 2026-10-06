@@ -4,23 +4,24 @@
  */
 
 /** 账号：4-16 位，只能用字母、数字、下划线 */
-const error_register_username = /^[A-Za-z0-9_]{4,32}$/
-const error_register_password = /^[A-Za-z0-9_]{6,64}$/
+const error_username = /^[A-Za-z0-9_]{4,32}$/
+const error_password = /^[A-Za-z0-9_]{6,64}$/
 
 
 /**
- * 登录页的账号校验：只校验非空。
- * 登录不做格式限制，避免历史账号因为规则收紧而登不进来。
+ * 登录页的账号校验：非空 + 格式要求。
+ * 
  */
 export function validateLoginUsername(value: string): string {
   if (!value) return '请输入账号'
+  if (!error_username.test(value)) return '账号需为 4-32 位，包含字母、数字或下划线'
   return ''
 }
 
 /** 注册页的账号校验：需要满足格式要求 */
 export function validateRegisterUsername(value: string): string {
   if (!value) return '请输入账号'
-  if (!error_register_username.test(value)) return '账号需为 4-32 位字母、数字或下划线'
+  if (!error_username.test(value)) return '账号需为 4-32 位，包含字母、数字或下划线'
   return ''
 }
 
@@ -28,9 +29,9 @@ export function validateRegisterUsername(value: string): string {
 export function validatePassword(value: string): string {
   if (!value) return '请输入密码'
   if (/\s/.test(value)) return '密码不能包含空格'
-  if (!error_register_password.test(value)) return '密码不能包含特殊字符'
   if (value.length < 6) return '密码长度不能少于 6 位'
   if (value.length > 64) return '密码长度不能超过 64 位'
+  if (!error_password.test(value)) return '密码不能包含特殊字符与空格'
   return ''
 }
 

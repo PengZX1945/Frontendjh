@@ -15,9 +15,9 @@
         label="账号"
         icon="user"
         name="username"
-        placeholder="4-16 位字母、数字或下划线"
+        placeholder="4-32 位字母、数字或下划线"
         autocomplete="username"
-        :maxlength="16"
+        :maxlength="32"
         :error="errors.username"
       />
 
@@ -28,9 +28,9 @@
         icon="lock"
         type="password"
         name="password"
-        placeholder="6-20 位，不能包含特殊符号"
+        placeholder="6-64 位，不能包含特殊符号"
         autocomplete="new-password"
-        :maxlength="20"
+        :maxlength="64"
         :error="errors.password"
       />
 
@@ -54,7 +54,7 @@
         name="confirm"
         placeholder="请再次输入密码"
         autocomplete="new-password"
-        :maxlength="20"
+        :maxlength="64"
         :error="errors.confirm"
       />
 
@@ -93,7 +93,10 @@ const MOCK_DELAY = 600
 const router = useRouter()
 
 const form = reactive({ username: '', password: '', confirm: '' })
-const errors = reactive({ username: '', password: '', confirm: '', agree: '' })
+const errors = reactive({ username: '',
+                          password: '',
+                          confirm: '',
+                          agree: '' })
 const agreed = ref(false)
 const loading = ref(false)
 const message = ref('')
