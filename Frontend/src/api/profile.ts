@@ -1,6 +1,6 @@
 /**
  * 个人信息相关接口：1.4 获取信息 / 1.5 修改信息 / 1.6 修改密码。
- * 与 api/items.ts 一样受 USE_LOCAL_API 控制，后端就绪后改成 false 即可。
+ * 与 api/items.ts 一样受 USE_LOCAL_API 控制，后端就绪后改成 false 即可。; 
  *
  * 注意：1.5、1.6 的 user_id 是 query 参数，值取 1.4 返回的 data.id（即接口文档里的「从 auth 传入」）。
  */

@@ -1,7 +1,7 @@
 /**
  * 本地兜底：后端 /api 还没就绪时，把帖子存进 localStorage，让发布 / 列表流程先跑通。
  * 思路和 api/localAccounts.ts 的本地登录一致；要停用就把 api/items.ts 里的
- * USE_LOCAL_ITEMS 改成 false。
+ * USE_LOCAL_ITEMS 改成 false。;
  */
 import {
   ItemStatus,
