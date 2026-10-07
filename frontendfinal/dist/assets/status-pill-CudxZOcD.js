@@ -1,0 +1,1 @@
+import{D as e,d as t,g as n,gt as r,vt as i}from"./_plugin-vue_export-helper-Nfg9ag7S.js";var a=n({__name:`status-pill`,props:{label:{},tone:{}},setup(n){return(a,o)=>(e(),t(`span`,{class:r([`status-pill`,`status-pill--${n.tone??`neutral`}`])},i(n.label),3))}});export{a as t};
