@@ -1,0 +1,95 @@
+/**
+ * 设计令牌（Design Tokens）
+ *
+ * 视觉基线参考 Apple 的界面体系：以中性灰阶承载信息，单一强调色负责引导，
+ * 表面用大圆角与低对比弥散阴影分层，正文与标题之间靠字重和字距拉开层次。
+ * 所有组件只消费这里的变量，不写死颜色与尺寸。
+ */
+
+:root {
+  /* ── 表面 ───────────────────────────────────────────── */
+  --surface-canvas: #ffffff;
+  --surface-sunken: #f5f5f7;
+  --surface-sunken-strong: #ececf0;
+  --surface-glass: rgba(255, 255, 255, 0.72);
+  --surface-overlay: rgba(0, 0, 0, 0.48);
+
+  /* ── 文字 ───────────────────────────────────────────── */
+  --ink-primary: #1d1d1f;
+  --ink-secondary: #6e6e73;
+  --ink-tertiary: #86868b;
+  --ink-inverse: #ffffff;
+
+  /* ── 描边 ───────────────────────────────────────────── */
+  --line-hairline: rgba(0, 0, 0, 0.08);
+  --line-strong: rgba(0, 0, 0, 0.16);
+
+  /* ── 强调与语义色 ───────────────────────────────────── */
+  --accent: #0071e3;
+  --accent-hover: #0077ed;
+  --accent-soft: rgba(0, 113, 227, 0.1);
+  --accent-ink: #0066cc;
+
+  --danger: #d70015;
+  --danger-soft: rgba(215, 0, 21, 0.1);
+
+  --warning: #a05a00;
+  --warning-soft: rgba(160, 90, 0, 0.12);
+
+  --positive: #1d7a3e;
+  --positive-soft: rgba(29, 122, 62, 0.1);
+
+  --neutral-soft: rgba(0, 0, 0, 0.06);
+
+  /* ── 圆角 ───────────────────────────────────────────── */
+  --radius-pill: 980px;
+  --radius-xl: 28px;
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+
+  /* ── 阴影：低对比、大扩散 ───────────────────────────── */
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.06);
+  --shadow-raised: 0 12px 36px rgba(0, 0, 0, 0.1);
+  --shadow-float: 0 24px 64px rgba(0, 0, 0, 0.18);
+
+  /* ── 间距节奏（4 的倍数） ───────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* ── 排版 ───────────────────────────────────────────── */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* ── 动效 ───────────────────────────────────────────── */
+  --ease-standard: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 180ms;
+  --duration-base: 320ms;
+
+  /* ── 布局 ───────────────────────────────────────────── */
+  --layout-content-width: 1180px;
+  --layout-header-height: 52px;
+  --layout-gutter: 24px;
+}
+
+/* 窄屏收紧留白与圆角，保持「大屏宽松、小屏紧凑」的一致观感 */
+@media (max-width: 640px) {
+  :root {
+    --layout-gutter: 16px;
+    --radius-xl: 22px;
+    --radius-lg: 18px;
+  }
+}
