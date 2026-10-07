@@ -1,0 +1,50 @@
+html,body,#app{
+  /* 为了让屏幕显示最大 */
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+/* ===== 全局按钮统一，视觉和谐一致 ===== */
+:root {
+  --el-border-radius-base: 6px;
+}
+
+.el-button {
+  border-radius: 6px;
+  height: 34px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: transform .15s ease, box-shadow .2s ease,
+    background-color .2s, border-color .2s, color .2s;
+}
+.el-button:active {
+  transform: scale(.97);
+}
+.el-button:focus-visible {
+  outline: 2px solid rgba(64, 158, 255, .5);
+  outline-offset: 1px;
+}
+.el-button--small {
+  height: 28px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+.el-button--large {
+  height: 42px;
+  padding: 0 22px;
+  font-size: 15px;
+}
+
+/* hover：非纯文本按钮轻微上浮 + 主/危险实底按钮加投影，增强层次感 */
+.el-button:not(.is-text):not(.is-link):hover {
+  transform: translateY(-1px);
+}
+.el-button--primary:not(.is-plain):not(.is-text):hover,
+.el-button--danger:not(.is-plain):not(.is-text):hover {
+  box-shadow: 0 4px 14px rgba(64, 158, 255, .28);
+}
+.el-button--danger:not(.is-plain):not(.is-text):hover {
+  box-shadow: 0 4px 14px rgba(245, 108, 108, .28);
+}
