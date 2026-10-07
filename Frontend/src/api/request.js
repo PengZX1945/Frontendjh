@@ -68,7 +68,7 @@ export function login(data) {
 
 /**
  * 注册接口
- * @param {{ username: string, password: string }} data
+ * @param {{ username: string, password: string, nickname: string, contact: string }} data
  * @returns {Promise<{ code?: number, msg?: string, data?: unknown }>?}
  * @see 错误码 10005 用户名已存在，完整表见 api/errorCode.ts
  */

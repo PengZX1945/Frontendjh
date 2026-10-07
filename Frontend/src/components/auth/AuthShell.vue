@@ -47,21 +47,12 @@ withDefaults(
   background: linear-gradient(60deg, #132f7c 0%, #538eed 65%, #73e8cc 100%);
 }
 
-/* 背景上的一层柔光，避免大块渐变显得单调 */
-.auth-shell::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.25), transparent 55%);
-  pointer-events: none;
-}
-
 .auth-card {
   position: relative;
   z-index: 1;
   box-sizing: border-box;
   width: 100%;
-  max-width: var(--auth-card-width, 380px);
+  max-width: var(--auth-card-width, 450px);
   padding: 34px 32px 28px;
   border: 1px solid rgba(148, 163, 184, 0.35);
   border-radius: 18px;

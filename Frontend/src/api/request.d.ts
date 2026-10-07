@@ -3,10 +3,18 @@
  * 让 TS 页面（登录 / 注册）在导入时不再报 TS7016「隐式拥有 any 类型」。
  */
 
-/** 登录 / 注册请求体 */
+/** 登录请求体 */
 export interface AuthPayload {
   username: string
   password: string
+}
+
+/** 注册请求体：比登录多昵称与联系方式 */
+export interface RegisterPayload extends AuthPayload {
+  /** 昵称，最长 64 字符 */
+  nickname: string
+  /** 联系方式，最长 128 字符 */
+  contact: string
 }
 
 /** 后端统一返回结构：code === 0 表示成功，其余错误码见 api/errorCode.ts */
@@ -25,4 +33,4 @@ export declare const req: import('axios').AxiosInstance
 export declare function login(data: AuthPayload): Promise<AuthResult>
 
 /** 注册接口；错误码 10005 用户名已存在 */
-export declare function register(data: AuthPayload): Promise<AuthResult>
+export declare function register(data: RegisterPayload): Promise<AuthResult>

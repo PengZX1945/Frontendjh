@@ -24,6 +24,18 @@
             <rect x="2" y="4" width="20" height="16" rx="2" />
             <path d="m22 6-10 7L2 6" />
           </template>
+          <template v-else-if="icon === 'nickname'">
+            <rect x="3" y="5" width="18" height="14" rx="2" />
+            <circle cx="9" cy="10.5" r="2" />
+            <path d="M6 16.5c0-1.4 1.3-2.5 3-2.5s3 1.1 3 2.5" />
+            <path d="M15 10h3.5" />
+            <path d="M15 14h3.5" />
+          </template>
+          <template v-else-if="icon === 'contact'">
+            <path d="M20.5 11.5a6.5 6.5 0 0 1-9.8 5.7L5 19l1.2-4.2A6.5 6.5 0 1 1 20.5 11.5Z" />
+            <path d="M9 11h6" />
+            <path d="M9 14h3.5" />
+          </template>
         </svg>
       </span>
 
@@ -99,7 +111,7 @@ const props = withDefaults(
     placeholder?: string
     autocomplete?: string
     /** 左侧图标，password 类型会自动出现「显示 / 隐藏密码」按钮 */
-    icon?: 'user' | 'lock' | 'mail'
+    icon?: 'user' | 'lock' | 'mail' | 'nickname' | 'contact'
     /** 校验错误信息，有值时输入框变红并在下方展示 */
     error?: string
     maxlength?: number

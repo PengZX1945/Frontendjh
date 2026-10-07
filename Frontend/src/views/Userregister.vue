@@ -22,6 +22,18 @@
       />
 
       <AuthInput
+        id="register-nickname"
+        v-model="form.nickname"
+        label="昵称"
+        icon="nickname"
+        name="nickname"
+        placeholder="展示给其他同学看的名字，最多 64 字符"
+        autocomplete="nickname"
+        :maxlength="64"
+        :error="errors.nickname"
+      />
+
+      <AuthInput
         id="register-password"
         v-model="form.password"
         label="密码"
@@ -58,6 +70,17 @@
         :error="errors.confirm"
       />
 
+      <AuthInput
+        id="register-contact"
+        v-model="form.contact"
+        label="联系方式"
+        icon="contact"
+        name="contact"
+        placeholder="手机号"
+        :maxlength="11"
+        :error="errors.contact"
+      />
+
       <div class="agree-wrap">
         <el-checkbox v-model="agreed" class="agree" @change="errors.agree = ''">
           我已阅读并同意 <a class="link" href="#">《用户服务协议》</a>
@@ -82,6 +105,8 @@ import {
   STRENGTH_TEXT,
   passwordStrength,
   validateConfirm,
+  validateContact,
+  validateNickname,
   validatePassword,
   validateRegisterUsername,
 } from '@/utils/validators'
@@ -92,10 +117,12 @@ const MOCK_DELAY = 600
 
 const router = useRouter()
 
-const form = reactive({ username: '', password: '', confirm: '' })
+const form = reactive({ username: '', nickname: '', password: '', confirm: '', contact: '' })
 const errors = reactive({ username: '',
+                          nickname: '',
                           password: '',
                           confirm: '',
+                          contact: '',
                           agree: '' })
 const agreed = ref(false)
 const loading = ref(false)
@@ -110,13 +137,24 @@ const strengthBars = computed(() => [1, 2, 3].map((n) => n <= strength.value))
 /** 校验整个表单，返回是否通过 */
 function validate(): boolean {
   form.username = form.username.trim()
+  form.nickname = form.nickname.trim()
+  form.contact = form.contact.trim()
 
   errors.username = validateRegisterUsername(form.username)
+  errors.nickname = validateNickname(form.nickname)
   errors.password = validatePassword(form.password)
   errors.confirm = validateConfirm(form.password, form.confirm)
+  errors.contact = validateContact(form.contact)
   errors.agree = agreed.value ? '' : '请先阅读并同意《用户服务协议》'
   // 空就是通过，非空就是不通过
-  return !errors.username && !errors.password && !errors.confirm && !errors.agree
+  return (
+    !errors.username &&
+    !errors.nickname &&
+    !errors.password &&
+    !errors.confirm &&
+    !errors.contact &&
+    !errors.agree
+  )
 }
 
 async function onSubmit() {
@@ -131,7 +169,12 @@ async function onSubmit() {
       // 模拟网络请求
       await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY))
     } else {
-      const res = await register({ username: form.username, password: form.password })
+      const res = await register({
+        username: form.username,
+        password: form.password,
+        nickname: form.nickname,
+        contact: form.contact,
+      })
 
       // 后端约定：code === 0 表示注册成功，其它错误码统一走错误码表（api/errorCode.ts）
       if (res?.code !== ErrorCode.SUCCESS) {
